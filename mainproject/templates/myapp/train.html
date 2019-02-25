@@ -1,0 +1,20 @@
+{% block content %}
+<body>
+	<h1>The maximum accuracy is : </h1>
+	<h2>{{ accuracy }} </h2>
+	<h1>The best algorithm is </h1>
+	<h2>{{ algorithm }}</h2>
+
+	<!-- To perform prediction using the model -->
+	<h1>Perform Prediction</h1>
+	{{ selectedInputFeatures }}
+
+	{% for i in selectedInputFeatures %}
+		
+		{{ i }} : <input type="text" name="LastName" value="Mouse"><br>
+		
+	{% endfor %}
+
+</body>
+{% endblock %}
+

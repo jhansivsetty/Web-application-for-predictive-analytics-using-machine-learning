@@ -1,0 +1,180 @@
+
+<head>
+{% include 'base/css.html' %}
+{% include 'base/bootstrap_defaults.html' %}
+
+<style>
+
+canvas {
+	width : 500px;
+	margin-right: 0;
+	padding: 0;
+	position:relative;
+	padding: 20px;
+	padding-bottom:10px;
+}
+</style>
+
+</head>
+
+<body>
+{% include 'base/js.html' %}
+<script>
+{% block jquery %}
+
+// basic bar plot
+var endpoint2 = '/upload/data'
+
+//scatter plot
+var mainData = []
+
+
+$.ajax({
+	method:"GET",
+	url:endpoint2,
+	success: function(data){
+		mainData = data
+
+		console.log(data)
+		var ipLocal = []
+		var opLocal = []
+		var p = data.ip
+		var reg_line_data  = data.reg_line_output 
+		var i = 0
+		
+		for (var key in  p) {
+			if (p.hasOwnProperty(key)) {
+				console.log(key + " -> " + p[key]);
+				ipLocal = p[key]
+				opLocal = data.op
+				var dataPoints = getDataPoints(ipLocal, opLocal)
+				
+				y_reg_line = reg_line_data[key]
+				var reg_line_points = getDataPoints(ipLocal, y_reg_line)
+				console.log(dataPoints)
+				//console.log(chartName)
+				correlationtype = data.correlations[key]
+			
+				setChart3(i, dataPoints, reg_line_points, correlationtype, key)
+				
+				i+=1
+			}
+		}
+		
+	},
+	error: function(error_data){
+		console.log("error")
+		console.log(error_data)
+	}
+})
+
+function getDataPoints(ipLocal, opLocal){
+	var dataPoints = []
+	for(var i = 0; i < ipLocal.length; i++) {
+			dataPoints.push({
+				x: ipLocal[i],
+				y: opLocal[i]
+			});
+		}
+	return dataPoints 
+}
+
+
+function setChart3(chartNumber, dataPoints, reg_line_points, correlationtype, xLabel){
+var newCanvas = document.createElement('canvas');
+document.getElementsByClassName("chartDisplay")[0].appendChild(newCanvas);
+newCanvas.style.display='inline-block';
+ var chartId = 'chart'+chartNumber;
+ newCanvas.id = chartId;
+ console.log(chartId)
+var ctx3 = document.getElementById(chartId).getContext('2d');
+var scatterChart = new Chart(ctx3, {
+    type: 'scatter',
+	    data: {
+        datasets: [{
+			borderColor : "#fffff",
+			data: reg_line_points,
+            //data: dataPoints,
+			backgroundColor: [
+                'rgba(225,0,0, 1.0)',
+                
+            ],
+            borderColor: [
+                'rgba(225,0,0,1.0)',
+            ],
+            borderWidth: 1
+        },
+		{
+			type: 'line',
+			data: dataPoints,
+			//data: reg_line_points,
+			// Changes this dataset to become a line
+			
+			backgroundColor: [
+                'rgba(0,0,225, 1.0)',
+                
+            ],
+		}]
+    },
+    options: {
+		legend: {
+			display: false
+		},
+		title: {
+            display: true,
+            text: correlationtype,
+			fontSize: 20,
+        },
+		responsive: false, 
+        scales: {
+            xAxes: [{
+				type: 'linear',
+				//type: 'linear',
+				position: 'bottom',
+				//to eliminate the lines in graph
+				gridLines: {
+				display: false
+					},
+				scaleLabel:{
+					display: true,
+					fontSize: 15,
+					labelString: xLabel,
+					scalelabelFontSize: 500,
+				}    
+				
+            }],
+			yAxes: [{
+				gridLines: {
+				display: false
+					},
+				scaleLabel: {
+				display: true,
+				fontSize: 15,
+				labelString: mainData.op_name,
+			}
+    }]
+    },
+    }
+});
+
+
+}
+<!-- var ctx = document.getElementById("myChart").getContext('2d'); -->
+
+{% endblock %}
+</script>
+
+{% block content %}
+<div class = "chartDisplay"></div>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.error %} class="{{ message.error }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% endblock content %}
+</body>
+
+

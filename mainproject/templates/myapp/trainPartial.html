@@ -1,0 +1,57 @@
+
+<head>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript">
+	<!-- Function to check if any of the check box is selected -->
+    function IsTermChecked() {
+        if (!$("input:checkbox").is(":checked")) {
+            alert("You must select a value in the checkbox");
+            return false;
+        }
+        else
+            return true;
+    }
+
+</script>
+	<style>
+	
+	
+		body {
+		  /* The image used */
+		  background-image: url("https://image.freepik.com/free-vector/technological-background-with-connected-lines_1017-7096.jpg");
+
+		  /* Full height */
+		  height: 100%;
+		  width: 100%;
+		  padding: 20px;
+		  /* Center and scale the image nicely */
+		  background-position: center;
+		  background-repeat: no-repeat;
+		  background-size: cover;
+	    }
+	
+	
+	</style>
+
+</head>
+<h2>Select the inputs to train</h2>
+{% block content %}
+<!-- Code to display the check boxes to allow partial training of data -->
+	<form action = "{% url 'myapp:startTraining' %}" method = "POST">
+		{% csrf_token %}
+		
+		{% for i in inputFeatures %}
+			
+			<input type="checkbox" name="partialFeatures" value="{{ i }}" > {{ i }}<br>
+			
+		{% endfor %}
+		
+		<button type="submit" onclick="return IsTermChecked();">Submit</button>
+		
+	</form>	
+		{% if success == '1' %}
+			{% include "myapp/trainingOutput.html "%}
+			<!-- Include another html which will make an ajax call and create charts -->
+		{% endif %}	
+	
+{% endblock content %}

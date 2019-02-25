@@ -1,0 +1,87 @@
+<html>
+	<head>
+		<title>Submit form without refreshing the page</title>
+		<style>
+	
+	
+		.bg {
+		  /* The image used */
+		  background-image: url("https://image.freepik.com/free-vector/technological-background-with-connected-lines_1017-7096.jpg");
+
+		  /* Full height */
+		  height: 100%;
+		  width: 100%;
+		  padding: 20px;
+		  /* Center and scale the image nicely */
+		  background-position: center;
+		  background-repeat: no-repeat;
+		  background-size: cover;
+	    }
+	
+	
+	</style>
+		
+	</head>
+	<div class = "bg">
+	<body>
+	{% block content %}
+	<!-- <script type="text/javascript"> -->
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript">
+			function Send() {
+				if (confirm('Are you sure to submit the data?')) {
+					<!-- alert("Are you sure to submit the data?") -->
+					<!-- alert($('form').serialize()); -->
+					$.ajax({
+					method:"POST",
+					url:"{% url 'myapp:predict' %}",
+					data:$('form').serialize(),
+					success: function(data){
+						console.log(data);
+						document.getElementById("outhead").style.visibility = "visible";
+						document.getElementById("outputValue").innerHTML = data.outputValue;
+						document.getElementById("outputName").innerHTML = data.outputName;
+					},
+					error: function(error_data){
+						console.log("error")
+						console.log(error_data);
+						
+					}
+					});
+				} else {
+					// Do nothing!
+				}
+				
+			
+			}
+
+		</script>
+	<center>
+	<h1>The maximum accuracy is  </h1>
+   <h2>{{ accuracy }} </h2>
+   <h1>The best algorithm is  </h1>
+   <h2>{{ algorithm }}</h2>
+   
+   <!-- To perform prediction using the model -->
+   <h1>Perform Prediction</h1>
+	
+		<form id="myform">
+			{% csrf_token %}
+			{% for i in selectedInputFeatures %}
+		
+			{{ i }} : <input type="text"  name='{{ i }}'><br>
+	
+			{% endfor %}	
+			<input type="button" id="send" value="Submit" required="required" onclick="Send()" />
+		</form>
+		
+		<div id="outhead" style="visibility:hidden"> the <div id="outputName"></div> is </div>
+		<div id="outputValue"></div>
+	</center>	
+		
+	{% endblock content %}
+	</div>
+	</body>
+</html>
+
+

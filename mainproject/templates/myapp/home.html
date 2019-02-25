@@ -1,0 +1,196 @@
+<html>
+<head>
+<style>
+
+ body, html {
+  padding: 0px;
+  margin: 0px;
+  display: inline-block;
+  top: 0;
+  left: 0;
+
+  /* Preserve aspet ratio */
+  min-width: 100%;
+  min-height: 100%;
+}
+.bg {
+  /* The image used */
+  background-image: url("https://chicago.medicine.uic.edu/wp-content/uploads/sites/6/2017/06/65thfiw.png");
+
+  /* Full height */
+  height: 100%;
+  width: 100%;
+  padding: 20px;
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.div1{
+  padding-top: 50px;
+  padding-right: 150px;
+  padding-bottom: 50px;
+  padding-left: 80px;
+  padding: 25px;
+  margin:0;
+}
+
+.box {
+    width: 500px;
+    margin: 200px 0;
+}
+
+
+.float {
+    position: absolute;
+    z-index: 2;
+}
+
+.form {
+    margin-left: 65px;
+}
+
+.ex1 {
+  background-color: white;
+  width: 1100px;
+  height: 400px;
+  overflow: scroll;
+}
+
+.links {
+	padding: 20px;
+}
+
+.mad1
+{
+padding :25px;
+width: 400px;
+margin :20px;
+padding: 0px;
+border: 5px solid gray;
+}
+
+
+
+
+</style>
+</head>
+<body>
+
+
+<div class = "bg">
+{% extends 'base.html' %}
+{% block content %}
+
+<center>
+	<div class = "mad1">
+
+		<div class = "div1">
+		{% if user.is_authenticated %}
+			<!--<div class = "mad">-->
+				Hello {{ user.username }}!
+			{% else %}
+				<p> You are not logged in </p>
+				<a href="{% url 'login '%}">login</a>
+			{% endif %}
+			<!--</div>-->
+		</div>
+
+		<form action="{% url 'myapp:upload' %}" method="post" enctype="multipart/form-data" style="margin:0;">
+			{% csrf_token %}
+			<center>
+				<input type="file"
+				   title="Upload csv file"
+				   id="fileUpload"
+				   name="csv_file"
+				   style="border: 1px solid black; padding: 5px;"
+				   required="required" onChange="Upload()"/>
+			</center>
+			<center>
+			<input type="submit"
+				id="next"
+			   value="Upload"
+					   style="margin:10px;"/>
+			</center>
+
+		</form>
+
+		<!-- Display error messages if any -->
+		{% if messages %}
+		<div class="error_message" id="error_message">
+			{% for message in messages %}
+			<div>
+				<div {% if message.error %} class="{{ message.error }}"{% endif %} style="color: red;padding-top: 10px;padding-bottom: 10px"/>{{ message }}
+			</div>
+			{% endfor %}
+		</div>
+		{% endif %}
+	</div>
+
+</center>
+
+<script type="text/javascript">
+
+function Upload() {
+	var fileUpload = document.getElementById("fileUpload");
+	if (typeof (fileUpload.files) != "undefined") {
+	var size = parseFloat(fileUpload.files[0].size / 1024).toFixed(2);
+		if(size < 1000){
+			<!--alert(size + " KB.");-->
+			document.getElementById("next").disabled = false;
+			<!-- To erase any earlier error messages-->
+			document.getElementById("error_message").innerHTML = "";
+		}
+		else{
+			alert(size + " KB." + "File is too big. Please upload file with size lesser than 5000 KB");
+			document.getElementById("next").disabled = true;
+		}
+	  <!-- alert(size + " KB."); -->
+	}
+	else {
+		alert("This browser does not support HTML5.");
+	}
+}
+</script>
+
+
+<center>
+<div class="ex1">
+	<center>
+	{% if csv_data is not empty %}
+
+	{% include "myapp/charts.html "%}
+	<!-- Include another html which will make an ajax call and create charts -->
+{% endif %}
+	</center>
+
+</div>
+
+</center>
+{% if csv_data is not empty %}
+
+	{% include "myapp/charts.html "%}
+	<!-- Include another html which will make an ajax call and create charts -->
+{% endif %}
+
+<center>
+	<div class="links">
+
+		<a href="{% url 'myapp:trainComplete' %}" class="btn btn-default" style="margin: 20px;">Train Model with Complete data</a>
+
+		<a href="{% url 'myapp:trainPartial' %}" class="btn btn-default" style="margin: 20px;">Train Model with selected inputs</a>
+	</div>
+</center>
+
+
+<!-- Omit this part : Just a footer -->
+
+{%endblock%}
+
+</div>
+
+
+
+</body>
+</html>
